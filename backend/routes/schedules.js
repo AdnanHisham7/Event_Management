@@ -84,4 +84,42 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.post('/:event_id/participants', async (req, res) => {
+    const { event_id } = req.params;
+  const { participant_ids } = req.body;
+
+  if (!participant_ids || !Array.isArray(participant_ids)) {
+    return res.status(400).json({ error: 'Participant IDs are required and must be an array.' });
+  }
+
+  try {
+    // Validate if the event exists
+    const eventCheck = await pool.query('SELECT * FROM events WHERE event_id = $1', [event_id]);
+    if (eventCheck.rowCount === 0) {
+      return res.status(404).json({ error: 'Event not found.' });
+    }
+
+    // Insert participants into event_participants table
+    const queries = participant_ids.map(async participant_id => {
+      const participantCheck = await pool.query('SELECT * FROM participants WHERE participant_id = $1', [participant_id]);
+
+      if (participantCheck.rowCount === 0) {
+        throw new Error(`Participant with ID ${participant_id} does not exist.`);
+      }
+
+      return pool.query(
+        'INSERT INTO event_participants (event_id, participant_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [event_id, participant_id]
+      );
+    });
+
+    await Promise.all(queries);
+
+    res.status(200).json({ message: 'Participants added successfully.' });
+  } catch (error) {
+    console.error('Error adding participants:', error.message);
+    res.status(500).json({ error: error.message || 'Internal Server Error' });
+  }
+  });
+
 module.exports = router;

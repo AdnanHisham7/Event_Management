@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Organizer</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./js/events.js" defer></script>
+  <script src="./js/participants.js" defer></script>
+  <script src="./js/schedules.js" defer></script>
+  <script src="./js/animation.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+  <div class="container max-w-md mx-auto py-10">
+    <h1 class="text-4xl font-bold text-center mb-8">Event Organizer</h1>
+
+    <div class="bg-white max-w-md shadow-md rounded-md p-6">
+      <div class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-xl font-bold mb-4 text-gray-700">Add Participant</h2>
+        <form id="participantForm" class="space-y-4">
+          <div>
+            <input type="text" id="participantName" placeholder="Name" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none" />
+          </div>
+          <div>
+            <input type="email" id="participantEmail" placeholder="Email" required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none" />
+          </div>
+          <button type="submit"
+            class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-200">
+            Add Participant
+          </button>
+        </form>
+      </div>
+      <ul id="participantList" class="max-w-md mx-auto mt-6 space-y-4">
+        <!-- Participant items will be dynamically inserted here -->
+      </ul>
+    </div>
+
+  </div>
+
+
+
+  
+
+
+
+  
+</body>
+
+</html>

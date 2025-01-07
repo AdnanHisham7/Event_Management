@@ -1,190 +1,243 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // !events
-  let eventIdToDelete = null; // Store the event ID to be deleted
+async function fetchParticipants() {
+  try {
+    const response = await fetch("/api/participants"); // Adjust if needed
+    const participants = await response.json();
 
-  // Function to show the confirmation modal
-  function confirmDelete(eventId) {
-    eventIdToDelete = eventId;
-    const modal = document.getElementById("deleteModal");
-    modal.classList.remove("hidden");
+    const participantSelect = document.getElementById("participants");
+    participantSelect.innerHTML = ""; // Clear existing options
+
+    participants.forEach((participant) => {
+      const option = document.createElement("option");
+      option.value = participant.participant_id;
+      option.textContent = `${participant.name} (${participant.email})`;
+      participantSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error fetching participants:", error);
   }
+}
 
-  // Function to close the confirmation modal
-  function closeModal() {
-    const modal = document.getElementById("deleteModal");
-    modal.classList.add("hidden");
-  }
+document
+  .getElementById("schedule-form")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  // Function to delete the event
-  async function deleteEvent() {
+    const eventName = document.getElementById("event_name").value;
+    const date = document.getElementById("date").value;
+    const startTime = document.getElementById("start_time").value;
+    const endTime = document.getElementById("end_time").value;
+    const participantIds = Array.from(
+      document.getElementById("participants").selectedOptions
+    ).map((option) => option.value);
+
     try {
-      const response = await fetch(`/api/events/${eventIdToDelete}`, {
-        method: "DELETE",
+      const response = await fetch("/api/schedules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event_name: eventName,
+          date,
+          start_time: startTime,
+          end_time: endTime,
+          participant_ids: participantIds,
+        }),
       });
-      const data = await response.json();
 
-      if (data.message === "Event deleted successfully") {
-        alert("Event deleted successfully");
-        // Remove the event from the UI
-        const eventItem = document.getElementById(`event-${eventIdToDelete}`);
-        eventItem.remove();
-        const modal = document.getElementById("deleteModal");
-        modal.classList.add("hidden");
+      if (response.ok) {
+        alert("Schedule created successfully!");
+        fetchSchedules(); // Refresh schedule list
+        event.target.reset(); // Reset form
+        document.getElementById('schedule-modal').classList.toggle('hidden');
       } else {
-        alert("Failed to delete event");
+        const error = await response.json();
+        alert(`Error: ${error.message}`);
       }
     } catch (error) {
-      console.error("Error deleting event:", error);
-      alert("Error deleting event");
+      console.error("Error creating schedule:", error);
     }
-  }
+  });
 
-  const eventModal = document.getElementById("eventModal");
-  const modalForm = document.getElementById("modalForm");
-  const modalTitle = document.getElementById("modalTitle");
-  const addEventButton = document.getElementById("addEventButton");
-  const cancelModal = document.getElementById("cancelModal");
-  let editingEventId = null;
+// Fetch participants on page load
+fetchParticipants();
 
-  // Open Modal
-  function openModal(mode, event = null) {
-    if (mode === "edit") {
-      modalTitle.textContent = "Edit Event";
+async function fetchSchedules() {
+  try {
+    const response = await fetch("/api/schedules");
+    const schedules = await response.json();
 
-      // Format the date for the input field
-      const formattedDate = new Date(event.date).toISOString().split("T")[0];
+    const scheduleList = document.getElementById("schedule-list");
+    scheduleList.innerHTML = ""; // Clear previous content
 
-      document.getElementById("modalEventName").value = event.event_name;
-      document.getElementById("modalEventDate").value = formattedDate;
-      document.getElementById("modalStartTime").value = event.start_time;
-      document.getElementById("modalEndTime").value = event.end_time;
-      editingEventId = event.event_id; // Store the event ID for PUT request
-    } else {
-      modalTitle.textContent = "Add Event";
-      modalForm.reset();
-      editingEventId = null; // Clear the event ID when adding
-    }
-    eventModal.classList.remove("hidden"); // Show the modal
-  }
-
-  // Close Modal
-  function closeModal() {
-    eventModal.classList.add("hidden"); // Hide the modal
-  }
-
-  // Fetch and Display Events
-  async function fetchEvents() {
-    try {
-      const response = await fetch("/api/events");
-      const events = await response.json();
-      renderEvents(events);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    }
-  }
-
-  function renderEvents(events) {
-    const eventList = document.getElementById("eventList");
-    eventList.innerHTML = ""; // Clear previous events
-
-    events.forEach((event) => {
-      const [year, month, day] = event.date.split("T")[0].split("-");
+    schedules.forEach((schedule) => {
+      // Create the event card
+      console.log(schedule);
+      const eventCard = document.createElement("div");
+      eventCard.className = "bg-white shadow-lg rounded-lg overflow-hidden";
+      const [year, month, day] = schedule.date.split("T")[0].split("-");
       const formattedDate = `${day}-${month}-${year}`;
 
-      const eventItem = document.createElement("li");
-      eventItem.id = `event-${event.event_id}`;
-      eventItem.className = "mb-2 flex justify-between items-center";
-      eventItem.innerHTML = `<span>${event.event_name} (${formattedDate})</span>
-        <div>
-          <button class="text-blue-500 edit-btn" data-id="${event.event_id}">Edit</button>
-          <button class="text-red-500 delete-btn" data-id="${event.event_id}">Delete</button>
-        </div>`;
+      let randomImage = getRandomImage();
+      Promise.all([randomImage])
+        .then((res) => {
+          const imgSrc = res[0];
+          eventCard.innerHTML = `
+      <img src='${imgSrc}' alt="Card Image" class="w-full h-48 object-cover">
+      <div class="p-4">
+        <h3 class="font-bold text-xl mb-2">${schedule.event_name}</h3>
+        <p class="flex text-xs gap-2"><span class="bg-blue-900 rounded-xl text-gray-100 px-2 py-1"><i class="fa-regular fa-calendar mr-1"></i>${formattedDate}</span> <span class="bg-yellow-600 rounded-xl text-gray-100 px-2 py-1"><i class="fa-regular fa-clock mr-1"></i> ${schedule.start_time} - ${
+            schedule.end_time
+          }</span></p>
+        
+        <div class="mt-2">
+        <h3 class="text-lg font-medium">Participants:</h3>
+        <ul class="list-disc list-inside">
+          ${
+            schedule.participants && schedule.participants.length > 0
+              ? schedule.participants
+                  .map(
+                    (p) =>
+                      `<li>${p.participant_name} (${p.participant_email})</li>`
+                  )
+                  .join("")
+              : "<li>No participants</li>"
+          }
+        </ul>
+        
+        ${
+          schedule.participants && schedule.participants.length === 0
+            ? `<button class="bg-blue-500 text-white px-4 py-2 mt-2 rounded hover:bg-blue-600" onclick="showAssignForm(${schedule.event_id})">Assign Participants</button>
+          
+          <div id="assign-form-${schedule.event_id}" class="hidden mt-4">
+            <select id="participant-select-${schedule.event_id}" class="w-full mt-1 p-2 border border-gray-300 rounded" multiple></select>
+            <button class="bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-600" onclick="assignParticipants(${schedule.event_id})">Add Selected</button>
+          </div>`
+            : ""
+        }
+      </div>`;
+        })
+        .catch((err) => {
+          console.log("some error occcured :", err);
+        });
 
-      eventList.appendChild(eventItem);
+      // Event details
+      //       eventCard.innerHTML = `
+      //   <h2 class="text-xl font-semibold">${schedule.event_name}</h2>
+      //   <p class="text-gray-600">${schedule.date} | ${schedule.start_time} - ${
+      //         schedule.end_time
+      //       }</p>
+      //   <div class="mt-2">
+      //     <h3 class="text-lg font-medium">Participants:</h3>
+      //     <ul class="list-disc list-inside">
+      //       ${
+      //         schedule.participants && schedule.participants.length > 0
+      //           ? schedule.participants
+      //               .map(
+      //                 (p) => `<li>${p.participant_name} (${p.participant_email})</li>`
+      //               )
+      //               .join("")
+      //           : "<li>No participants</li>"
+      //       }
+      //     </ul>
+      //     ${
+      //       schedule.participants && schedule.participants.length === 0
+      //         ? `
+      //         <button class="bg-blue-500 text-white px-4 py-2 mt-2 rounded hover:bg-blue-600" onclick="showAssignForm(${schedule.event_id})">
+      //           Assign Participants
+      //         </button>
+      //         <div id="assign-form-${schedule.event_id}" class="hidden mt-4">
+      //           <select id="participant-select-${schedule.event_id}" class="w-full mt-1 p-2 border border-gray-300 rounded" multiple></select>
+      //           <button class="bg-green-500 text-white px-4 py-2 mt-2 rounded hover:bg-green-600" onclick="assignParticipants(${schedule.event_id})">
+      //             Add Selected
+      //           </button>
+      //         </div>
+      //         `
+      //         : ""
+      //     }
+      //   </div>
+      // `;
+
+      scheduleList.appendChild(eventCard);
     });
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+  }
+}
 
-    // Attach dynamic event listeners
-    document.querySelectorAll(".edit-btn").forEach((button) => {
-      button.addEventListener("click", (e) => {
-        const eventId = e.target.getAttribute("data-id");
-        fetch(`/api/events/${eventId}`)
-          .then((res) => res.json())
-          .then((event) => openModal("edit", event))
-          .catch((error) => console.error("Error fetching event:", error));
+async function getRandomImage() {
+  const urls = [
+    "https://cdn.pixabay.com/photo/2020/02/03/00/12/fiber-4814456_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2017/08/12/06/06/fiber-optics-2633604_640.jpg",
+    "https://cdn.pixabay.com/photo/2023/02/06/03/24/cable-7771045_640.jpg",
+    "https://cdn.pixabay.com/photo/2020/11/05/13/42/wire-sculpture-5715170_640.jpg",
+    "https://cdn.pixabay.com/photo/2016/12/01/13/15/light-bulbs-1875268_640.jpg",
+    "https://cdn.pixabay.com/photo/2020/10/05/08/34/cherries-5628562_640.jpg",
+    "https://cdn.pixabay.com/photo/2019/08/08/16/51/lwl-4393369_640.jpg",
+    "https://cdn.pixabay.com/photo/2015/03/13/20/42/plug-672231_640.jpg",
+  ];
+
+  const randomIndex = Number(Math.random().toFixed(1).split(".")[1]);
+  return urls[randomIndex];
+}
+// Fetch schedules on page load
+fetchSchedules();
+
+async function showAssignForm(eventId) {
+  const form = document.getElementById(`assign-form-${eventId}`);
+  const participantSelect = document.getElementById(
+    `participant-select-${eventId}`
+  );
+
+  // Toggle form visibility
+  form.classList.toggle("hidden");
+
+  // Fetch participants only if the dropdown is empty
+  if (participantSelect.options.length === 0) {
+    try {
+      const response = await fetch("/api/participants");
+      const participants = await response.json();
+
+      participants.forEach((participant) => {
+        const option = document.createElement("option");
+        option.value = participant.participant_id;
+        option.textContent = `${participant.name} (${participant.email})`;
+        participantSelect.appendChild(option);
       });
-    });
+    } catch (error) {
+      console.error("Error fetching participants:", error);
+    }
+  }
+}
 
-    document.querySelectorAll(".delete-btn").forEach((button) => {
-      button.addEventListener("click", (e) => {
-        const eventId = e.target.getAttribute("data-id");
-        confirmDelete(eventId);
-      });
-    });
+async function assignParticipants(eventId) {
+  const participantSelect = document.getElementById(
+    `participant-select-${eventId}`
+  );
+  const selectedIds = Array.from(participantSelect.selectedOptions).map(
+    (option) => option.value
+  );
+
+  if (selectedIds.length === 0) {
+    alert("Please select at least one participant to assign.");
+    return;
   }
 
-  // Form Submission
-  modalForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const eventData = {
-      event_name: document.getElementById("modalEventName").value,
-      date: document.getElementById("modalEventDate").value,
-      start_time: document.getElementById("modalStartTime").value,
-      end_time: document.getElementById("modalEndTime").value,
-    };
+  try {
+    const response = await fetch(`/api/schedules/${eventId}/participants`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ participant_ids: selectedIds }),
+    });
 
-    try {
-      if (editingEventId) {
-        // Update Event (PUT request)
-        const response = await fetch(`/api/events/${editingEventId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventData),
-        });
-        if (response.ok) alert("Event updated successfully!");
-      } else {
-        // Create Event (POST request)
-        const response = await fetch("/api/events", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(eventData),
-        });
-        if (response.ok) alert("Event added successfully!");
-      }
-      closeModal();
-      fetchEvents(); // Reload the events after adding/updating
-    } catch (error) {
-      console.error("Error saving event:", error);
+    if (response.ok) {
+      alert("Participants assigned successfully!");
+      fetchSchedules(); // Refresh the schedule list
+    } else {
+      const error = await response.json();
+      console.error("Server Error:", error);
+      alert(`Error: ${error.error || "Unknown error"}`);
     }
-  });
-
-  // Bind modal buttons
-  document
-    .getElementById("confirmDelete")
-    .addEventListener("click", deleteEvent);
-  document.getElementById("cancelDelete").addEventListener("click", () => {
-    const modal = document.getElementById("deleteModal");
-    modal.classList.add("hidden");
-  });
-
-  addEventButton.addEventListener("click", () => openModal("add")); // Open modal in add mode
-  cancelModal.addEventListener("click", closeModal); // Close modal when cancel button is clicked
-
-  // Initial Fetch
-  fetchEvents();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-});
+  } catch (error) {
+    console.error("Network Error:", error);
+    alert("Network Error: Could not assign participants.");
+  }
+}

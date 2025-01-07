@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
       eventItem.className = "mb-2 flex justify-between items-center";
       eventItem.innerHTML = `<span>${event.event_name} (${formattedDate})</span>
         <div>
-          <button class="text-blue-500 edit-btn" data-id="${event.event_id}">Edit</button>
+          <button class="text-blue-500 edit-btn mr-2" data-id="${event.event_id}">Edit</button>
           <button class="text-red-500 delete-btn" data-id="${event.event_id}">Delete</button>
         </div>`;
 

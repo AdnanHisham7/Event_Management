@@ -19,9 +19,6 @@ app.get('/', (req, res) => {
 res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-
-
-
 app.use('/api/events', eventsRouter);
 app.use('/api/participants', participantsRouter);
 app.use('/api/schedules', schedulessRouter);
