@@ -5,11 +5,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Organizer</title>
-    <script src="./scripts.js" defer></script>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./js/events.js" defer></script>
+    <script src="./js/participants.js" defer></script>
+    <script src="./js/animation.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-gray-100">
+    <div class="container max-w-3xl mx-auto py-10">
+        <h1 class="text-4xl font-bold text-center mb-8">Event Organizer</h1>
+
+        <!-- Accordion for Events -->
+        <div class="bg-white shadow-md rounded-md mb-6">
+            <button class="w-full flex justify-between items-center px-6 py-4 bg-gray-200 font-bold text-lg rounded-t-md" id="eventsAccordion">
+                <span>Events</span>
+                <svg class="w-5 h-5 transform transition-transform" id="eventsChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div class="p-6 space-y-4 hidden" id="eventsContent">
+                <button id="addEventButton" class="bg-blue-500 text-white py-2 px-4 rounded mb-4">Add Event</button>
+                <div id="eventsList" class="bg-gray-50 p-4 rounded-md">
+                    <h2 class="text-xl font-bold mb-4">Scheduled Events</h2>
+                    <ul id="eventList" class="list-disc pl-6">
+                        <!-- Event items will be dynamically inserted here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion for Participants -->
+        <div class="bg-white shadow-md rounded-md">
+            <button class="w-full flex justify-between items-center px-6 py-4 bg-green-50 font-bold text-lg rounded-t-md" id="participantsAccordion">
+                <span>Participants</span>
+                <svg class="w-5 h-5 transform transition-transform" id="participantsChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div class="p-6 space-y-4 hidden" id="participantsContent">
+                <div class="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700">Add Participant</h2>
+                    <form id="participantForm" class="space-y-4">
+                        <div>
+                            <input type="text" id="participantName" placeholder="Name" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none" />
+                        </div>
+                        <div>
+                            <input type="email" id="participantEmail" placeholder="Email" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-green-400 focus:outline-none" />
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-200">
+                            Add Participant
+                        </button>
+                    </form>
+                </div>
+                <ul id="participantList" class="max-w-md mx-auto mt-6 space-y-4">
+                    <!-- Participant items will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- Add/Edit Event Modal -->
     <div id="eventModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-lg shadow-lg p-6 w-1/3">
@@ -41,37 +101,37 @@
             </form>
         </div>
     </div>
-
-    <!-- Main Page -->
-    <div class="container mx-auto py-10">
-        <h1 class="text-4xl font-bold text-center mb-8">Event Organizer</h1>
-        <button id="addEventButton" class="bg-blue-500 text-white py-2 px-4 rounded mb-6">Add Event</button>
-        <div id="events" class="bg-white p-6 rounded shadow-md">
-            <h2 class="text-2xl font-bold mb-4">Scheduled Events</h2>
-            <ul id="eventList" class="list-disc pl-6">
-                <li id="event-1" class="mb-2 flex justify-between">
-                    <span>Event Name</span>
-                    <div>
-                        <button onclick="editEvent(1)" class="text-blue-500">Edit</button>
-                        <button onclick="confirmDelete(1)" class="text-red-500">Delete</button>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
+    
     <!-- Modal for confirmation -->
     <div id="deleteModal" class="fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-50 hidden">
         <div class="bg-white p-6 rounded shadow-lg">
             <h2 class="text-xl font-bold">Are you sure you want to delete this event?</h2>
             <div class="flex justify-end mt-4">
-                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded mr-4">Cancel</button>
-                <button onclick="deleteEvent()" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
+                <button id="cancelDelete" class="bg-gray-500 text-white px-4 py-2 rounded mr-4">Cancel</button>
+                <button id="confirmDelete" class="bg-red-500 text-white px-4 py-2 rounded">Delete</button>
             </div>
         </div>
     </div>
+
     <script>
-        
+        // Toggle accordion functionality
+        const eventsAccordion = document.getElementById("eventsAccordion");
+        const eventsContent = document.getElementById("eventsContent");
+        const eventsChevron = document.getElementById("eventsChevron");
+
+        const participantsAccordion = document.getElementById("participantsAccordion");
+        const participantsContent = document.getElementById("participantsContent");
+        const participantsChevron = document.getElementById("participantsChevron");
+
+        eventsAccordion.addEventListener("click", () => {
+            const isHidden = eventsContent.classList.toggle("hidden");
+            eventsChevron.classList.toggle("rotate-180", !isHidden);
+        });
+
+        participantsAccordion.addEventListener("click", () => {
+            const isHidden = participantsContent.classList.toggle("hidden");
+            participantsChevron.classList.toggle("rotate-180", !isHidden);
+        });
     </script>
 </body>
 

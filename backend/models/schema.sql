@@ -2,7 +2,6 @@
 CREATE TABLE events (
     event_id SERIAL PRIMARY KEY,
     event_name VARCHAR(255) NOT NULL,
-    description TEXT,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL
