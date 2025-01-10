@@ -8,6 +8,8 @@ router.get("/", async (req, res) => {
   res.json(result.rows);
 });
 
+
+
 // Add an event with conflict detection
 router.post("/", async (req, res) => {
   const { event_name, date, start_time, end_time } = req.body;
@@ -47,6 +49,8 @@ router.post("/", async (req, res) => {
   ]);
   res.status(201).json(result.rows[0]);
 });
+
+
 
 // get an event using id
 router.get("/:id", async (req, res) => {
@@ -91,6 +95,8 @@ router.put("/:id", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+
 
 // delete an event
 router.delete("/:id", async (req, res) => {

@@ -50,6 +50,7 @@ async function fetchParticipants() {
       if (response.ok) {
         alert("Participant added successfully");
         fetchParticipants();
+        window.location.reload()
       } else {
         const data = await response.json();
         alert(data.error || "Failed to add participant");
@@ -67,6 +68,8 @@ async function fetchParticipants() {
       if (response.ok) {
         alert("Participant removed successfully");
         fetchParticipants();
+        window.location.reload()
+
       } else {
         alert("Failed to remove participant");
       }

@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../models/db");
 
+
+// get all the scheduled events
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -51,6 +53,8 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+
 // Create a new schedule (event with participants)
 router.post('/', async (req, res) => {
   const { event_name, date, start_time, end_time, participant_ids } = req.body;
@@ -84,6 +88,8 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+// Assign participants to already scheduled event
 router.post('/:event_id/participants', async (req, res) => {
     const { event_id } = req.params;
   const { participant_ids } = req.body;

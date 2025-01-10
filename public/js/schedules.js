@@ -165,17 +165,20 @@ async function fetchSchedules() {
 
 async function getRandomImage() {
   const urls = [
-    "https://cdn.pixabay.com/photo/2020/02/03/00/12/fiber-4814456_960_720.jpg",
-    "https://cdn.pixabay.com/photo/2017/08/12/06/06/fiber-optics-2633604_640.jpg",
-    "https://cdn.pixabay.com/photo/2023/02/06/03/24/cable-7771045_640.jpg",
-    "https://cdn.pixabay.com/photo/2020/11/05/13/42/wire-sculpture-5715170_640.jpg",
-    "https://cdn.pixabay.com/photo/2016/12/01/13/15/light-bulbs-1875268_640.jpg",
-    "https://cdn.pixabay.com/photo/2020/10/05/08/34/cherries-5628562_640.jpg",
-    "https://cdn.pixabay.com/photo/2019/08/08/16/51/lwl-4393369_640.jpg",
-    "https://cdn.pixabay.com/photo/2015/03/13/20/42/plug-672231_640.jpg",
+    "https://cdn.pixabay.com/photo/2014/06/30/11/40/cupcakes-380178_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2016/12/03/04/22/bokeh-1879081_1280.jpg",
+    "https://cdn.pixabay.com/photo/2016/11/21/12/30/new-years-eve-1845065_1280.jpg",
+    "https://cdn.pixabay.com/photo/2016/06/03/14/31/dinner-1433494_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2020/10/29/13/34/table-5696243_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2018/05/10/11/34/concert-3387324_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2017/11/24/10/43/ticket-2974645_960_720.jpg",
+    "https://cdn.pixabay.com/photo/2017/12/08/11/53/event-party-3005668_640.jpg",
+    "https://cdn.pixabay.com/photo/2016/07/05/19/59/christening-1499314_640.jpg",
+    "https://cdn.pixabay.com/photo/2012/02/22/15/44/chairs-15364_640.jpg",
+    "https://cdn.pixabay.com/photo/2016/09/12/23/21/chairs-1666070_640.jpg","https://cdn.pixabay.com/photo/2015/10/18/14/10/smoke-994491_640.jpg","https://cdn.pixabay.com/photo/2016/11/18/17/47/iphone-1836071_640.jpg","https://cdn.pixabay.com/photo/2016/12/28/20/30/wedding-1937022_640.jpg"
   ];
 
-  const randomIndex = Number(Math.random().toFixed(1).split(".")[1]);
+  const randomIndex = Math.floor(Math.random() * urls.length);
   return urls[randomIndex];
 }
 // Fetch schedules on page load

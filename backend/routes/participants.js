@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../models/db");
 
-
 // Add a new participant
 router.post("/", async (req, res) => {
   const { name, email } = req.body;
@@ -22,6 +21,8 @@ router.post("/", async (req, res) => {
     }
   }
 });
+
+
 
 // Fetch all participants
 router.get("/", async (req, res) => {

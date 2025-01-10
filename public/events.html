@@ -11,6 +11,7 @@
   <script src="./js/schedules.js" defer></script>
   <script src="./js/animation.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="./images/favicon.png">
 
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
@@ -19,18 +20,16 @@
   <div class="container max-w-4xl mx-auto py-10">
     <h1 class="text-4xl font-bold text-center mb-8">Manage Events</h1>
 
-      <button id="addEventButton" class="text-sm px-4 py-2 font-bold text-white bg-gray-900 rounded border-2 border-gray-900 shadow-lg hover:bg-transparent hover:text-black transition mb-2">Add Event</button>
-      <div id="eventsList" class="bg-gray-50 p-4 rounded-md">
-        <h2 class="text-xl font-bold mb-4">Scheduled Events</h2>
-        <ul id="eventList" class="list-disc pl-6">
-          <!-- Event items will be dynamically inserted here -->
-        </ul>
-      </div>
-
-
+    <button id="addEventButton"
+      class="text-sm px-4 py-2 font-bold text-white bg-gray-900 rounded border-2 border-gray-900 shadow-lg hover:bg-transparent hover:text-black transition mb-2">Add
+      Event</button>
+    <div id="eventsList" class="bg-gray-50 p-4 rounded-md">
+      <h2 class="text-xl font-bold mb-4">Scheduled Events</h2>
+      <ul id="eventList" class="list-disc pl-6">
+        <!-- Event items will be dynamically inserted here -->
+      </ul>
+    </div>
   </div>
-
-
 
   <!-- Add/Edit Event Modal -->
   <div id="eventModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
@@ -73,9 +72,6 @@
       </div>
     </div>
   </div>
-
-
-
 
 </body>
 
